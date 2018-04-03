@@ -11,21 +11,21 @@ type Screen struct {
 	entrys                                           []*Entry
 	text                                             *Text
 	Xpos, Ypos                                       float64
-	fontpicpath, fontjsonpath, buttonpath, entrypath string
+	fontpngpath, fontjsonpath, buttonpath, entrypath string
 }
 
-func (screen *Screen) InitGui(fontpicpath, fontjsonpath, buttonpath, entrypath string) {
-	screen.fontpicpath = fontpicpath
+func (screen *Screen) InitGui(fontpngpath, fontjsonpath, buttonpath, entrypath string) {
+	screen.fontpngpath = fontpngpath
 	screen.fontjsonpath = fontjsonpath
 	screen.buttonpath = buttonpath
 	screen.entrypath = entrypath
+	screen.text = NewText(screen)
 
 }
 
 func NewScreen(window *glfw.Window) *Screen {
 	s := Screen{}
 	s.window = window
-	s.text = NewText()
 	return &s
 }
 func (screen *Screen) Update() {

@@ -71,7 +71,7 @@ func FramebufferSize(w *glfw.Window) (fbw, fbh int) {
 }
 
 // NewText creates a new Text object
-func NewText() *Text {
+func NewText(screen *Screen) *Text {
 	text := Text{}
 
 	text.charInfo = make(map[string]charInfo)
@@ -88,7 +88,7 @@ func NewText() *Text {
 
 	// Load up texture info
 	var textMeta map[string]interface{}
-	textMetaBytes, e := ioutil.ReadFile("font/font.json")
+	textMetaBytes, e := ioutil.ReadFile(screen.fontjsonpath)
 	if e != nil {
 		panic(e)
 	}
@@ -110,7 +110,7 @@ func NewText() *Text {
 	// Generated from https://evanw.github.io/font-texture-generator/
 	// Inconsolata font (installed on system with Google Web Fonts), size 24
 	// Power of 2, white with black stroke, thickness 2
-	existingImageFile, err := os.Open("font/font.png")
+	existingImageFile, err := os.Open(screen.fontpngpath)
 	if err != nil {
 		panic(err)
 	}

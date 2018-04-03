@@ -4,16 +4,10 @@ type Entry struct {
 	Text string
 	X    int
 	Y    int
-	Bg   string
 }
 
-func NewEntry(screen *Screen, text string, x, y int, bg string) *Entry {
+func NewEntry(screen *Screen, text string, x, y int) *Entry {
 	e := Entry{}
-	if bg == "" {
-		e.Bg = "#ffffff"
-	} else {
-		e.Bg = bg
-	}
 	e.Text = text
 	e.X = x
 	e.Y = y

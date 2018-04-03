@@ -141,7 +141,7 @@ func (b *Button) isInside(x, y float64) bool {
 	return x >= b.X && x <= b.X+b.W && y >= b.Y && y <= b.Y+b.H
 
 }
-func NewButton(screen *Screen, text string, command func(), x, y, w, h, border float64, bg string) *Button {
+func NewButton(screen *Screen, text string, command func(), x, y, w, h, border float64) *Button {
 	b := Button{}
 	b.Text = text
 	b.X = x
@@ -157,7 +157,7 @@ func NewButton(screen *Screen, text string, command func(), x, y, w, h, border f
 	b.colorlocation = uniformLocation(b.program, "color")
 	b.textureUniform = uniformLocation(b.program, "texFont")
 	bindAttribute(b.program, 0, "coord")
-	existingImageFile, err := os.Open(bg)
+	existingImageFile, err := os.Open(screen.buttonpath)
 	if err != nil {
 		panic(err)
 	}
