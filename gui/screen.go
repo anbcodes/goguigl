@@ -5,18 +5,25 @@ import (
 )
 
 type Screen struct {
-	bg         string
-	window     *glfw.Window
-	labels     []*Label
-	buttons    []*Button
-	entrys     []*Entry
-	text       *Text
-	Xpos, Ypos float64
+	window                                           *glfw.Window
+	labels                                           []*Label
+	buttons                                          []*Button
+	entrys                                           []*Entry
+	text                                             *Text
+	Xpos, Ypos                                       float64
+	fontpicpath, fontjsonpath, buttonpath, entrypath string
 }
 
-func NewScreen(bg string, window *glfw.Window) *Screen {
+func (screen *Screen) InitGui(fontpicpath, fontjsonpath, buttonpath, entrypath string) {
+	screen.fontpicpath = fontpicpath
+	screen.fontjsonpath = fontjsonpath
+	screen.buttonpath = buttonpath
+	screen.entrypath = entrypath
+
+}
+
+func NewScreen(window *glfw.Window) *Screen {
 	s := Screen{}
-	s.bg = bg
 	s.window = window
 	s.text = NewText()
 	return &s
