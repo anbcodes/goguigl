@@ -188,10 +188,10 @@ func (text *Text) computeGeometry(width, height int, x, y, size float32, cx, cy 
 }
 
 // Draw draws the overlay text
-func (text *Text) Draw(drawtext string, x, y, size float64, cx, cy bool, w *glfw.Window) {
+func (text *Text) draw(drawtext string, x, y, size float64, cx, cy bool, w *glfw.Window) {
 	wi, h := FramebufferSize(w)
 	text.statusLine.str = drawtext
-	text.computeGeometry(wi, h, float32(x), float32(y), float32(size), cx, cy)
+	text.computeGeometry(wi, h, float32(x), float32(-y), float32(size), cx, cy)
 	gl.UseProgram(text.program)
 	gl.Uniform1i(text.textureUniform, text.textureUnit)
 	gl.BindVertexArray(text.drawableVAO)

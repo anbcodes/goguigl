@@ -113,7 +113,7 @@ func uniformLocation(program uint32, name string) int32 {
 	free()
 	return uniform
 }
-func InitGlfw() *glfw.Window {
+func InitGlfw(windowsizex, windowsizey int, windowname string) *glfw.Window {
 	if err := glfw.Init(); err != nil {
 		panic(err)
 	}
@@ -122,7 +122,7 @@ func InitGlfw() *glfw.Window {
 	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
 	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
 
-	window, err := glfw.CreateWindow(500, 500, "World Blocks", nil, nil)
+	window, err := glfw.CreateWindow(windowsizex, windowsizey, windowname, nil, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -147,4 +147,11 @@ func InitOpenGL() {
 
 	gl.Enable(gl.BLEND)
 	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+}
+func max(num1, num2 int) int {
+	if num1 > num2 {
+		return num1
+	} else {
+		return num2
+	}
 }

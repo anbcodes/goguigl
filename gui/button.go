@@ -52,80 +52,80 @@ void main(void) {
 }
 `
 
-func (b *Button) TextSize(screen *Screen) (size float64) {
+func (b *Button) textSize(screen *Screen) (size float64) {
 	wi, ht := FramebufferSize(screen.window)
 	y := b.H / 2
 	x := b.W / float64(len(b.Text)) * 19 / 12 * float64(wi) / float64(ht)
 	size = math.Min(x, y)
 	return
 }
-func (b *Button) Draw(screen *Screen) {
+func (b *Button) draw(screen *Screen) {
 	gl.UseProgram(b.program)
 	wi, ht := FramebufferSize(screen.window)
 	cx := b.C * float64(ht) / float64(wi)
 	points := []float32{
 		float32(b.X), float32(b.Y), 0, 0,
 		float32(b.X + cx), float32(b.Y), 0.33, 0,
-		float32(b.X), float32(b.Y - b.C), 0, 0.33,
-		float32(b.X), float32(b.Y - b.C), 0, 0.33,
-		float32(b.X + cx), float32(b.Y - b.C), 0.33, 0.33,
+		float32(b.X), float32(b.Y + b.C), 0, 0.33,
+		float32(b.X), float32(b.Y + b.C), 0, 0.33,
+		float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
 		float32(b.X + cx), float32(b.Y), 0.33, 0,
 
 		float32(b.X + cx), float32(b.Y), 0.33, 0,
 		float32(b.X + b.W - cx), float32(b.Y), 0.67, 0,
-		float32(b.X + cx), float32(b.Y - b.C), 0.33, 0.33,
-		float32(b.X + cx), float32(b.Y - b.C), 0.33, 0.33,
+		float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
+		float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
 		float32(b.X + b.W - cx), float32(b.Y), 0.67, 0,
-		float32(b.X + b.W - cx), float32(b.Y - b.C), 0.67, 0.33,
+		float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
 
 		float32(b.X + b.W - cx), float32(b.Y), 0.67, 0,
 		float32(b.X + b.W), float32(b.Y), 1, 0,
-		float32(b.X + b.W - cx), float32(b.Y - b.C), 0.67, 0.33,
-		float32(b.X + b.W - cx), float32(b.Y - b.C), 0.67, 0.33,
+		float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
+		float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
 		float32(b.X + b.W), float32(b.Y), 1, 0,
-		float32(b.X + b.W), float32(b.Y - b.C), 1, 0.33,
+		float32(b.X + b.W), float32(b.Y + b.C), 1, 0.33,
 
-		float32(b.X), float32(b.Y - b.C), 0, 0.33,
-		float32(b.X), float32(b.Y - b.H + b.C), 0, 0.67,
-		float32(b.X + cx), float32(b.Y - b.C), 0.33, 0.33,
-		float32(b.X + cx), float32(b.Y - b.C), 0.33, 0.33,
-		float32(b.X), float32(b.Y - b.H + b.C), 0, 0.67,
-		float32(b.X + cx), float32(b.Y - b.H + b.C), 0.33, 0.67,
+		float32(b.X), float32(b.Y + b.C), 0, 0.33,
+		float32(b.X), float32(b.Y + b.H - b.C), 0, 0.67,
+		float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
+		float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
+		float32(b.X), float32(b.Y + b.H - b.C), 0, 0.67,
+		float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
 
-		float32(b.X + cx), float32(b.Y - b.C), 0.33, 0.33,
-		float32(b.X + b.W - cx), float32(b.Y - b.C), 0.67, 0.33,
-		float32(b.X + cx), float32(b.Y - b.H + b.C), 0.33, 0.67,
-		float32(b.X + b.W - cx), float32(b.Y - b.C), 0.67, 0.33,
-		float32(b.X + cx), float32(b.Y - b.H + b.C), 0.33, 0.67,
-		float32(b.X + b.W - cx), float32(b.Y - b.H + b.C), 0.67, 0.67,
+		float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
+		float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
+		float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
+		float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
+		float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
+		float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
 
-		float32(b.X + b.W - cx), float32(b.Y - b.C), 0.67, 0.33,
-		float32(b.X + b.W - cx), float32(b.Y - b.H + b.C), 0.67, 0.67,
-		float32(b.X + b.W), float32(b.Y - b.C), 1, 0.33,
-		float32(b.X + b.W - cx), float32(b.Y - b.H + b.C), 0.67, 0.67,
-		float32(b.X + b.W), float32(b.Y - b.C), 1, 0.33,
-		float32(b.X + b.W), float32(b.Y - b.H + b.C), 1, 0.67,
+		float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
+		float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
+		float32(b.X + b.W), float32(b.Y + b.C), 1, 0.33,
+		float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
+		float32(b.X + b.W), float32(b.Y + b.C), 1, 0.33,
+		float32(b.X + b.W), float32(b.Y + b.H - b.C), 1, 0.67,
 
-		float32(b.X), float32(b.Y - b.H + b.C), 0, 0.67,
-		float32(b.X), float32(b.Y - b.H), 0, 1,
-		float32(b.X + cx), float32(b.Y - b.H + b.C), 0.33, 0.67,
-		float32(b.X), float32(b.Y - b.H), 0, 1,
-		float32(b.X + cx), float32(b.Y - b.H + b.C), 0.33, 0.67,
-		float32(b.X + cx), float32(b.Y - b.H), 0.33, 1,
+		float32(b.X), float32(b.Y + b.H - b.C), 0, 0.67,
+		float32(b.X), float32(b.Y + b.H), 0, 1,
+		float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
+		float32(b.X), float32(b.Y + b.H), 0, 1,
+		float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
+		float32(b.X + cx), float32(b.Y + b.H), 0.33, 1,
 
-		float32(b.X + cx), float32(b.Y - b.H + b.C), 0.33, 0.67,
-		float32(b.X + b.W - cx), float32(b.Y - b.H + b.C), 0.67, 0.67,
-		float32(b.X + cx), float32(b.Y - b.H), 0.33, 1,
-		float32(b.X + cx), float32(b.Y - b.H), 0.33, 1,
-		float32(b.X + b.W - cx), float32(b.Y - b.H + b.C), 0.67, 0.67,
-		float32(b.X + b.W - cx), float32(b.Y - b.H), 0.67, 1,
+		float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
+		float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
+		float32(b.X + cx), float32(b.Y + b.H), 0.33, 1,
+		float32(b.X + cx), float32(b.Y + b.H), 0.33, 1,
+		float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
+		float32(b.X + b.W - cx), float32(b.Y + b.H), 0.67, 1,
 
-		float32(b.X + b.W - cx), float32(b.Y - b.H + b.C), 0.67, 0.67,
-		float32(b.X + b.W), float32(b.Y - b.H + b.C), 1, 0.67,
-		float32(b.X + b.W - cx), float32(b.Y - b.H), 0.67, 1,
-		float32(b.X + b.W - cx), float32(b.Y - b.H), 0.67, 1,
-		float32(b.X + b.W), float32(b.Y - b.H + b.C), 1, 0.67,
-		float32(b.X + b.W), float32(b.Y - b.H), 1, 1,
+		float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
+		float32(b.X + b.W), float32(b.Y + b.H - b.C), 1, 0.67,
+		float32(b.X + b.W - cx), float32(b.Y + b.H), 0.67, 1,
+		float32(b.X + b.W - cx), float32(b.Y + b.H), 0.67, 1,
+		float32(b.X + b.W), float32(b.Y + b.H - b.C), 1, 0.67,
+		float32(b.X + b.W), float32(b.Y + b.H), 1, 1,
 	}
 	fillVBO(b.pointsVBO, points)
 	if b.mouseover {
@@ -141,7 +141,7 @@ func (b *Button) isInside(x, y float64) bool {
 	return x >= b.X && x <= b.X+b.W && y >= b.Y && y <= b.Y+b.H
 
 }
-func NewButton(screen *Screen, text string, command func(), x, y, w, h, border float64) *Button {
+func NewButton(screen *Screen, text string, x, y, w, h, border float64, command func()) *Button {
 	b := Button{}
 	b.Text = text
 	b.X = x
@@ -150,7 +150,6 @@ func NewButton(screen *Screen, text string, command func(), x, y, w, h, border f
 	b.H = h
 	b.C = border
 	b.Command = command
-
 	b.pointsVBO = newVBO()
 	b.drawableVAO = newPointsVAO(b.pointsVBO, 4)
 	b.program = createProgram(vertexShader, fragmentShader)

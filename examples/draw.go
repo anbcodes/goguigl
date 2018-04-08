@@ -15,21 +15,28 @@ func windowSizeCallback(w *glfw.Window, wd, ht int) {
 func hi() {
 	println("WORKED!!!")
 }
+func hi2() {
+	println("WORKED!!!2")
+}
 func main() {
 	// println(gl.LESS)
 	runtime.LockOSThread()
-	w := gui.InitGlfw()
+	w := gui.InitGlfw(700, 500, "launcher")
 	gui.InitOpenGL()
 	w.SetSizeCallback(windowSizeCallback)
 	screen := gui.NewScreen(w)
-	screen.InitGui("extras/font/font.png", "extras/font/font.json", "extras/button.png", "")
+	screen.InitGui("extras/font/font.png", "extras/font/font.json", "extras/button.png", "extras/entry.png", 0.3)
 	guimousebuttoncallback := screen.MouseButtonCallback()
 	guicursorposcallback := screen.CursorPosCallback()
+	guikeycallback := screen.KeyCallBack()
 	w.SetMouseButtonCallback(guimousebuttoncallback)
 	w.SetCursorPosCallback(guicursorposcallback)
-	b := gui.NewButton(screen, "hiasfdslksdfajl", hi, 0, 0, 0.5, 1, 0.2)
+	w.SetKeyCallback(guikeycallback)
+	gui.NewButton(screen, "pick profile", -0.7, -0.7, 0.3, 0.1, 0.05, hi)
+	gui.NewButton(screen, "new profile", -1, -0.7, 0.3, 0.1, 0.05, hi2)
+	// gui.NewButton(screen, "hellohello", 0, 0.5, 1, 1, 0.1, hi)
+
 	// gui.NewLabel(screen, "Hello World", 0.5, 0.5, 0.1)
-	b.Text = "hisldsflsfdahjlsd"
 	// gl.DepthFunc(gl.LEQUAL)
 	for {
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
