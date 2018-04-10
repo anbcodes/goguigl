@@ -22,6 +22,8 @@ type Button struct {
 	texture        uint32
 	textureUnit    int32
 	colorlocation  int32
+	Screen         *Screen
+	index          int
 }
 
 const vertexShader = `
@@ -53,7 +55,7 @@ void main(void) {
 `
 
 func (b *Button) textSize(screen *Screen) (size float64) {
-	wi, ht := FramebufferSize(screen.window)
+	wi, ht := FramebufferSize(screen.Window)
 	y := b.H / 2
 	x := b.W / float64(len(b.Text)) * 19 / 12 * float64(wi) / float64(ht)
 	size = math.Min(x, y)
@@ -61,7 +63,7 @@ func (b *Button) textSize(screen *Screen) (size float64) {
 }
 func (b *Button) draw(screen *Screen) {
 	gl.UseProgram(b.program)
-	wi, ht := FramebufferSize(screen.window)
+	wi, ht := FramebufferSize(screen.Window)
 	cx := b.C * float64(ht) / float64(wi)
 	points := []float32{
 		float32(b.X), float32(b.Y), 0, 0,
@@ -137,6 +139,11 @@ func (b *Button) draw(screen *Screen) {
 	gl.BindVertexArray(b.drawableVAO)
 	gl.DrawArrays(gl.TRIANGLES, 0, 6*9)
 }
+
+func (b *Button) Remove() {
+	b.Screen.buttons[len(b.Screen.buttons)-1], b.Screen.buttons[b.index] = b.Screen.buttons[b.index], b.Screen.buttons[len(b.Screen.buttons)-1]
+	b.Screen.buttons = b.Screen.buttons[:len(b.Screen.buttons)-1]
+}
 func (b *Button) isInside(x, y float64) bool {
 	return x >= b.X && x <= b.X+b.W && y >= b.Y && y <= b.Y+b.H
 
@@ -155,6 +162,7 @@ func NewButton(screen *Screen, text string, x, y, w, h, border float64, command 
 	b.program = createProgram(vertexShader, fragmentShader)
 	b.colorlocation = uniformLocation(b.program, "color")
 	b.textureUniform = uniformLocation(b.program, "texFont")
+	b.Screen = screen
 	bindAttribute(b.program, 0, "coord")
 	existingImageFile, err := os.Open(screen.buttonpath)
 	if err != nil {
@@ -192,6 +200,7 @@ func NewButton(screen *Screen, text string, x, y, w, h, border float64, command 
 	)
 
 	gl.GenerateMipmap(gl.TEXTURE_2D)
+	b.index = len(screen.buttons) + 1
 	screen.buttons = append(screen.buttons, &b)
 	return &b
 }

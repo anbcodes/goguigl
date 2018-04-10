@@ -7,7 +7,7 @@ import (
 )
 
 type Screen struct {
-	window                                           *glfw.Window
+	Window                                           *glfw.Window
 	labels                                           []*Label
 	buttons                                          []*Button
 	entrys                                           []*Entry
@@ -29,23 +29,27 @@ func (screen *Screen) InitGui(fontpngpath, fontjsonpath, buttonpath, entrypath s
 	screen.keys = "`1234567890-=qwertyuiop[]\\asdfghjkl;'zxcvbnm,./ "
 	screen.keysShift = "~!@#$%^&*()_+QWERTYUIOP{}|ASDFGHJKL:\"ZXCVBNM<>?"
 }
-
+func (screen *Screen) Clear() {
+	screen.entrys = nil
+	screen.buttons = nil
+	screen.labels = nil
+}
 func NewScreen(window *glfw.Window) *Screen {
 	s := Screen{}
-	s.window = window
+	s.Window = window
 	return &s
 }
 func (screen *Screen) Update() {
 	for _, label := range screen.labels {
-		screen.text.draw(label.Text, label.X, label.Y, label.Size, false, false, screen.window)
+		screen.text.draw(label.Text, label.X, label.Y, label.Size, false, false, screen.Window)
 	}
 	for _, button := range screen.buttons {
 		button.draw(screen)
-		screen.text.draw(button.Text, button.X+button.W/2, button.Y+button.H/2, button.textSize(screen), true, true, screen.window)
+		screen.text.draw(button.Text, button.X+button.W/2, button.Y+button.H/2, button.textSize(screen), true, true, screen.Window)
 	}
 	for _, entry := range screen.entrys {
 		entry.draw(screen)
-		screen.text.draw(entry.Text, entry.X, entry.Y+entry.H/2, math.Min(entry.textSize(screen), screen.MaxTextSize), false, true, screen.window)
+		screen.text.draw(entry.Text, entry.X, entry.Y+entry.H/2, math.Min(entry.textSize(screen), screen.MaxTextSize), false, true, screen.Window)
 	}
 }
 func (screen *Screen) MouseButtonCallback() func(w *glfw.Window, button glfw.MouseButton, action glfw.Action, mods glfw.ModifierKey) {
@@ -89,6 +93,9 @@ func (screen *Screen) KeyCallBack() func(w *glfw.Window, key glfw.Key, scancode 
 						e.Text = e.Text[0:max(len(e.Text)-1, 0)]
 					} else if k == "enter" && e.Command != nil {
 						e.Command()
+					} else if k == "escape" {
+						e.Focus = false
+					} else if k == "enter" {
 					} else {
 						e.Text += k
 					}
@@ -183,7 +190,56 @@ func (screen *Screen) KeyCallBack() func(w *glfw.Window, key glfw.Key, scancode 
 				h = "delete"
 			case glfw.KeySpace:
 				h = " "
+			case glfw.KeyApostrophe:
+				h = "'"
+			case glfw.KeyKP0:
+				h = "0"
+			case glfw.KeyKP1:
+				h = "1"
+			case glfw.KeyKP2:
+				h = "2"
+			case glfw.KeyKP3:
+				h = "3"
+			case glfw.KeyKP4:
+				h = "4"
+			case glfw.KeyKP5:
+				h = "5"
+			case glfw.KeyKP6:
+				h = "6"
+			case glfw.KeyKP7:
+				h = "7"
+			case glfw.KeyKP8:
+				h = "8"
+			case glfw.KeyKP9:
+				h = "9"
+			case glfw.KeyKPEnter:
+				h = "Enter"
+			case glfw.KeyKPEqual:
+				h = "="
+			case glfw.KeyEqual:
+				h = "="
+			case glfw.KeyComma:
+				h = ","
+			case glfw.KeySlash:
+				h = "/"
+			case glfw.KeyMinus:
+				h = "-"
+			case glfw.KeyEscape:
+				h = "escape"
+			case glfw.KeyPeriod:
+				h = "."
+			case glfw.KeyBackslash:
+				h = "\\"
+			case glfw.KeySemicolon:
+				h = ";"
+			case glfw.KeyGraveAccent:
+				h = "`"
+			case glfw.KeyLeftBracket:
+				h = "["
+			case glfw.KeyRightBracket:
+				h = "]"
 			}
+
 		}
 
 		for f := range screen.keys {

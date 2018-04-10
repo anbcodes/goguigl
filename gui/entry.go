@@ -24,6 +24,8 @@ type Entry struct {
 	colorlocation  int32
 	Focus          bool
 	Command        func()
+	Screen         *Screen
+	index          int
 }
 
 const entryvertexShader = `
@@ -54,8 +56,12 @@ void main(void) {
 }
 `
 
+func (e *Entry) Remove() {
+	e.Screen.entrys[len(e.Screen.entrys)-1], e.Screen.entrys[e.index] = e.Screen.entrys[e.index], e.Screen.entrys[len(e.Screen.entrys)-1]
+	e.Screen.entrys = e.Screen.entrys[:len(e.Screen.entrys)-1]
+}
 func (e *Entry) textSize(screen *Screen) (size float64) {
-	wi, ht := FramebufferSize(screen.window)
+	wi, ht := FramebufferSize(screen.Window)
 	y := e.H / 2
 	x := e.W / float64(len(e.Text)) * 19 / 12 * float64(wi) / float64(ht)
 	size = math.Min(x, y)
@@ -63,10 +69,10 @@ func (e *Entry) textSize(screen *Screen) (size float64) {
 }
 func (e *Entry) draw(screen *Screen) {
 	gl.UseProgram(e.program)
-	wi, ht := FramebufferSize(screen.window)
+	wi, ht := FramebufferSize(screen.Window)
 	cy := e.C
 	if e.Focus {
-		cy *= 1.15
+		cy *= 1.20
 	}
 	cx := cy * float64(ht) / float64(wi)
 	points := []float32{
@@ -211,6 +217,8 @@ func NewEntry(screen *Screen, text string, x, y, w, h, border float64, command f
 	)
 
 	gl.GenerateMipmap(gl.TEXTURE_2D)
+	e.Screen = screen
+	e.index = len(screen.entrys) - 1
 	screen.entrys = append(screen.entrys, &e)
 	return &e
 }
