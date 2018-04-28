@@ -7,6 +7,7 @@ type Label struct {
 	Size   float64
 	Screen *Screen
 	index  int
+	Hide   bool
 }
 
 func (l *Label) Remove() {

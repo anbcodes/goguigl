@@ -24,6 +24,7 @@ type Button struct {
 	colorlocation  int32
 	Screen         *Screen
 	index          int
+	Hide           bool
 }
 
 const vertexShader = `
@@ -62,84 +63,85 @@ func (b *Button) textSize(screen *Screen) (size float64) {
 	return
 }
 func (b *Button) draw(screen *Screen) {
-	gl.UseProgram(b.program)
-	wi, ht := FramebufferSize(screen.Window)
-	cx := b.C * float64(ht) / float64(wi)
-	points := []float32{
-		float32(b.X), float32(b.Y), 0, 0,
-		float32(b.X + cx), float32(b.Y), 0.33, 0,
-		float32(b.X), float32(b.Y + b.C), 0, 0.33,
-		float32(b.X), float32(b.Y + b.C), 0, 0.33,
-		float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
-		float32(b.X + cx), float32(b.Y), 0.33, 0,
+	if !b.Hide {
+		gl.UseProgram(b.program)
+		wi, ht := FramebufferSize(screen.Window)
+		cx := b.C * float64(ht) / float64(wi)
+		points := []float32{
+			float32(b.X), float32(b.Y), 0, 0,
+			float32(b.X + cx), float32(b.Y), 0.33, 0,
+			float32(b.X), float32(b.Y + b.C), 0, 0.33,
+			float32(b.X), float32(b.Y + b.C), 0, 0.33,
+			float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
+			float32(b.X + cx), float32(b.Y), 0.33, 0,
 
-		float32(b.X + cx), float32(b.Y), 0.33, 0,
-		float32(b.X + b.W - cx), float32(b.Y), 0.67, 0,
-		float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
-		float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
-		float32(b.X + b.W - cx), float32(b.Y), 0.67, 0,
-		float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
+			float32(b.X + cx), float32(b.Y), 0.33, 0,
+			float32(b.X + b.W - cx), float32(b.Y), 0.67, 0,
+			float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
+			float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
+			float32(b.X + b.W - cx), float32(b.Y), 0.67, 0,
+			float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
 
-		float32(b.X + b.W - cx), float32(b.Y), 0.67, 0,
-		float32(b.X + b.W), float32(b.Y), 1, 0,
-		float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
-		float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
-		float32(b.X + b.W), float32(b.Y), 1, 0,
-		float32(b.X + b.W), float32(b.Y + b.C), 1, 0.33,
+			float32(b.X + b.W - cx), float32(b.Y), 0.67, 0,
+			float32(b.X + b.W), float32(b.Y), 1, 0,
+			float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
+			float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
+			float32(b.X + b.W), float32(b.Y), 1, 0,
+			float32(b.X + b.W), float32(b.Y + b.C), 1, 0.33,
 
-		float32(b.X), float32(b.Y + b.C), 0, 0.33,
-		float32(b.X), float32(b.Y + b.H - b.C), 0, 0.67,
-		float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
-		float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
-		float32(b.X), float32(b.Y + b.H - b.C), 0, 0.67,
-		float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
+			float32(b.X), float32(b.Y + b.C), 0, 0.33,
+			float32(b.X), float32(b.Y + b.H - b.C), 0, 0.67,
+			float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
+			float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
+			float32(b.X), float32(b.Y + b.H - b.C), 0, 0.67,
+			float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
 
-		float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
-		float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
-		float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
-		float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
-		float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
-		float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
+			float32(b.X + cx), float32(b.Y + b.C), 0.33, 0.33,
+			float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
+			float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
+			float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
+			float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
+			float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
 
-		float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
-		float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
-		float32(b.X + b.W), float32(b.Y + b.C), 1, 0.33,
-		float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
-		float32(b.X + b.W), float32(b.Y + b.C), 1, 0.33,
-		float32(b.X + b.W), float32(b.Y + b.H - b.C), 1, 0.67,
+			float32(b.X + b.W - cx), float32(b.Y + b.C), 0.67, 0.33,
+			float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
+			float32(b.X + b.W), float32(b.Y + b.C), 1, 0.33,
+			float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
+			float32(b.X + b.W), float32(b.Y + b.C), 1, 0.33,
+			float32(b.X + b.W), float32(b.Y + b.H - b.C), 1, 0.67,
 
-		float32(b.X), float32(b.Y + b.H - b.C), 0, 0.67,
-		float32(b.X), float32(b.Y + b.H), 0, 1,
-		float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
-		float32(b.X), float32(b.Y + b.H), 0, 1,
-		float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
-		float32(b.X + cx), float32(b.Y + b.H), 0.33, 1,
+			float32(b.X), float32(b.Y + b.H - b.C), 0, 0.67,
+			float32(b.X), float32(b.Y + b.H), 0, 1,
+			float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
+			float32(b.X), float32(b.Y + b.H), 0, 1,
+			float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
+			float32(b.X + cx), float32(b.Y + b.H), 0.33, 1,
 
-		float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
-		float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
-		float32(b.X + cx), float32(b.Y + b.H), 0.33, 1,
-		float32(b.X + cx), float32(b.Y + b.H), 0.33, 1,
-		float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
-		float32(b.X + b.W - cx), float32(b.Y + b.H), 0.67, 1,
+			float32(b.X + cx), float32(b.Y + b.H - b.C), 0.33, 0.67,
+			float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
+			float32(b.X + cx), float32(b.Y + b.H), 0.33, 1,
+			float32(b.X + cx), float32(b.Y + b.H), 0.33, 1,
+			float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
+			float32(b.X + b.W - cx), float32(b.Y + b.H), 0.67, 1,
 
-		float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
-		float32(b.X + b.W), float32(b.Y + b.H - b.C), 1, 0.67,
-		float32(b.X + b.W - cx), float32(b.Y + b.H), 0.67, 1,
-		float32(b.X + b.W - cx), float32(b.Y + b.H), 0.67, 1,
-		float32(b.X + b.W), float32(b.Y + b.H - b.C), 1, 0.67,
-		float32(b.X + b.W), float32(b.Y + b.H), 1, 1,
+			float32(b.X + b.W - cx), float32(b.Y + b.H - b.C), 0.67, 0.67,
+			float32(b.X + b.W), float32(b.Y + b.H - b.C), 1, 0.67,
+			float32(b.X + b.W - cx), float32(b.Y + b.H), 0.67, 1,
+			float32(b.X + b.W - cx), float32(b.Y + b.H), 0.67, 1,
+			float32(b.X + b.W), float32(b.Y + b.H - b.C), 1, 0.67,
+			float32(b.X + b.W), float32(b.Y + b.H), 1, 1,
+		}
+		fillVBO(b.pointsVBO, points)
+		if b.mouseover {
+			gl.Uniform4f(b.colorlocation, 0.9, 0.9, 0.9, 1.0)
+		} else {
+			gl.Uniform4f(b.colorlocation, 1.0, 1.0, 1.0, 1.0)
+		}
+		gl.Uniform1i(b.textureUniform, b.textureUnit)
+		gl.BindVertexArray(b.drawableVAO)
+		gl.DrawArrays(gl.TRIANGLES, 0, 6*9)
 	}
-	fillVBO(b.pointsVBO, points)
-	if b.mouseover {
-		gl.Uniform4f(b.colorlocation, 0.9, 0.9, 0.9, 1.0)
-	} else {
-		gl.Uniform4f(b.colorlocation, 1.0, 1.0, 1.0, 1.0)
-	}
-	gl.Uniform1i(b.textureUniform, b.textureUnit)
-	gl.BindVertexArray(b.drawableVAO)
-	gl.DrawArrays(gl.TRIANGLES, 0, 6*9)
 }
-
 func (b *Button) Remove() {
 	b.Screen.buttons[len(b.Screen.buttons)-1], b.Screen.buttons[b.index] = b.Screen.buttons[b.index], b.Screen.buttons[len(b.Screen.buttons)-1]
 	b.Screen.buttons = b.Screen.buttons[:len(b.Screen.buttons)-1]

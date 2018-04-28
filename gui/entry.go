@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/go-gl/gl/v4.1-core/gl"
+	"github.com/go-gl/glfw/v3.2/glfw"
 )
 
 //The Entry struct is a struct with the text, x, y, width (W), height (H), border (C), and focus which is if someone clicked on it
@@ -26,6 +27,9 @@ type Entry struct {
 	Command        func()
 	Screen         *Screen
 	index          int
+	Hide           bool
+	KeyHolder      bool
+	Key            glfw.Key
 }
 
 const entryvertexShader = `
@@ -68,87 +72,89 @@ func (e *Entry) textSize(screen *Screen) (size float64) {
 	return
 }
 func (e *Entry) draw(screen *Screen) {
-	gl.UseProgram(e.program)
-	wi, ht := FramebufferSize(screen.Window)
-	cy := e.C
-	if e.Focus {
-		cy *= 1.20
+	if !e.Hide {
+		gl.UseProgram(e.program)
+		wi, ht := FramebufferSize(screen.Window)
+		cy := e.C
+		if e.Focus {
+			cy *= 1.20
+		}
+		cx := cy * float64(ht) / float64(wi)
+		points := []float32{
+			//top left
+			float32(e.X), float32(e.Y), 0, 0,
+			float32(e.X + cx), float32(e.Y), 0.33, 0,
+			float32(e.X), float32(e.Y + cy), 0, 0.33,
+			float32(e.X), float32(e.Y + cy), 0, 0.33,
+			float32(e.X + cx), float32(e.Y + cy), 0.33, 0.33,
+			float32(e.X + cx), float32(e.Y), 0.33, 0,
+			//top middle
+			float32(e.X + cx), float32(e.Y), 0.33, 0,
+			float32(e.X + e.W - cx), float32(e.Y), 0.67, 0,
+			float32(e.X + cx), float32(e.Y + cy), 0.33, 0.33,
+			float32(e.X + cx), float32(e.Y + cy), 0.33, 0.33,
+			float32(e.X + e.W - cx), float32(e.Y), 0.67, 0,
+			float32(e.X + e.W - cx), float32(e.Y + cy), 0.67, 0.33,
+			//top right
+			float32(e.X + e.W - cx), float32(e.Y), 0.67, 0,
+			float32(e.X + e.W), float32(e.Y), 1, 0,
+			float32(e.X + e.W - cx), float32(e.Y + cy), 0.67, 0.33,
+			float32(e.X + e.W - cx), float32(e.Y + cy), 0.67, 0.33,
+			float32(e.X + e.W), float32(e.Y), 1, 0,
+			float32(e.X + e.W), float32(e.Y + cy), 1, 0.33,
+			//side right
+			float32(e.X), float32(e.Y + cy), 0, 0.33,
+			float32(e.X), float32(e.Y + e.H - cy), 0, 0.67,
+			float32(e.X + cx), float32(e.Y + cy), 0.33, 0.33,
+			float32(e.X + cx), float32(e.Y + cy), 0.33, 0.33,
+			float32(e.X), float32(e.Y + e.H - cy), 0, 0.67,
+			float32(e.X + cx), float32(e.Y + e.H - cy), 0.33, 0.67,
+			//middle
+			float32(e.X + cx), float32(e.Y + cy), 0.33, 0.33,
+			float32(e.X + e.W - cx), float32(e.Y + cy), 0.67, 0.33,
+			float32(e.X + cx), float32(e.Y + e.H - cy), 0.33, 0.67,
+			float32(e.X + e.W - cx), float32(e.Y + cy), 0.67, 0.33,
+			float32(e.X + cx), float32(e.Y + e.H - cy), 0.33, 0.67,
+			float32(e.X + e.W - cx), float32(e.Y + e.H - cy), 0.67, 0.67,
+			//side left
+			float32(e.X + e.W - cx), float32(e.Y + cy), 0.67, 0.33,
+			float32(e.X + e.W - cx), float32(e.Y + e.H - cy), 0.67, 0.67,
+			float32(e.X + e.W), float32(e.Y + cy), 1, 0.33,
+			float32(e.X + e.W - cx), float32(e.Y + e.H - cy), 0.67, 0.67,
+			float32(e.X + e.W), float32(e.Y + cy), 1, 0.33,
+			float32(e.X + e.W), float32(e.Y + e.H - cy), 1, 0.67,
+			//bottom left
+			float32(e.X), float32(e.Y + e.H - cy), 0, 0.67,
+			float32(e.X), float32(e.Y + e.H), 0, 1,
+			float32(e.X + cx), float32(e.Y + e.H - cy), 0.33, 0.67,
+			float32(e.X), float32(e.Y + e.H), 0, 1,
+			float32(e.X + cx), float32(e.Y + e.H - cy), 0.33, 0.67,
+			float32(e.X + cx), float32(e.Y + e.H), 0.33, 1,
+			//bottom middle
+			float32(e.X + cx), float32(e.Y + e.H - cy), 0.33, 0.67,
+			float32(e.X + e.W - cx), float32(e.Y + e.H - cy), 0.67, 0.67,
+			float32(e.X + cx), float32(e.Y + e.H), 0.33, 1,
+			float32(e.X + cx), float32(e.Y + e.H), 0.33, 1,
+			float32(e.X + e.W - cx), float32(e.Y + e.H - cy), 0.67, 0.67,
+			float32(e.X + e.W - cx), float32(e.Y + e.H), 0.67, 1,
+			//bottom left
+			float32(e.X + e.W - cx), float32(e.Y + e.H - cy), 0.67, 0.67,
+			float32(e.X + e.W), float32(e.Y + e.H - cy), 1, 0.67,
+			float32(e.X + e.W - cx), float32(e.Y + e.H), 0.67, 1,
+			float32(e.X + e.W - cx), float32(e.Y + e.H), 0.67, 1,
+			float32(e.X + e.W), float32(e.Y + e.H - cy), 1, 0.67,
+			float32(e.X + e.W), float32(e.Y + e.H), 1, 1,
+		}
+		fillVBO(e.pointsVBO, points)
+		if e.mouseover {
+			gl.Uniform4f(e.colorlocation, 0.9, 0.9, 0.9, 1.0)
+		} else {
+			gl.Uniform4f(e.colorlocation, 1.0, 1.0, 1.0, 1.0)
+		}
+		gl.Uniform1i(e.textureUniform, e.textureUnit)
+		gl.BindVertexArray(e.drawableVAO)
+		gl.DrawArrays(gl.TRIANGLES, 0, 6*9)
 	}
-	cx := cy * float64(ht) / float64(wi)
-	points := []float32{
-		//top left
-		float32(e.X), float32(e.Y), 0, 0,
-		float32(e.X + cx), float32(e.Y), 0.33, 0,
-		float32(e.X), float32(e.Y + cy), 0, 0.33,
-		float32(e.X), float32(e.Y + cy), 0, 0.33,
-		float32(e.X + cx), float32(e.Y + cy), 0.33, 0.33,
-		float32(e.X + cx), float32(e.Y), 0.33, 0,
-		//top middle
-		float32(e.X + cx), float32(e.Y), 0.33, 0,
-		float32(e.X + e.W - cx), float32(e.Y), 0.67, 0,
-		float32(e.X + cx), float32(e.Y + cy), 0.33, 0.33,
-		float32(e.X + cx), float32(e.Y + cy), 0.33, 0.33,
-		float32(e.X + e.W - cx), float32(e.Y), 0.67, 0,
-		float32(e.X + e.W - cx), float32(e.Y + cy), 0.67, 0.33,
-		//top right
-		float32(e.X + e.W - cx), float32(e.Y), 0.67, 0,
-		float32(e.X + e.W), float32(e.Y), 1, 0,
-		float32(e.X + e.W - cx), float32(e.Y + cy), 0.67, 0.33,
-		float32(e.X + e.W - cx), float32(e.Y + cy), 0.67, 0.33,
-		float32(e.X + e.W), float32(e.Y), 1, 0,
-		float32(e.X + e.W), float32(e.Y + cy), 1, 0.33,
-		//side right
-		float32(e.X), float32(e.Y + cy), 0, 0.33,
-		float32(e.X), float32(e.Y + e.H - cy), 0, 0.67,
-		float32(e.X + cx), float32(e.Y + cy), 0.33, 0.33,
-		float32(e.X + cx), float32(e.Y + cy), 0.33, 0.33,
-		float32(e.X), float32(e.Y + e.H - cy), 0, 0.67,
-		float32(e.X + cx), float32(e.Y + e.H - cy), 0.33, 0.67,
-		//middle
-		float32(e.X + cx), float32(e.Y + cy), 0.33, 0.33,
-		float32(e.X + e.W - cx), float32(e.Y + cy), 0.67, 0.33,
-		float32(e.X + cx), float32(e.Y + e.H - cy), 0.33, 0.67,
-		float32(e.X + e.W - cx), float32(e.Y + cy), 0.67, 0.33,
-		float32(e.X + cx), float32(e.Y + e.H - cy), 0.33, 0.67,
-		float32(e.X + e.W - cx), float32(e.Y + e.H - cy), 0.67, 0.67,
-		//side left
-		float32(e.X + e.W - cx), float32(e.Y + cy), 0.67, 0.33,
-		float32(e.X + e.W - cx), float32(e.Y + e.H - cy), 0.67, 0.67,
-		float32(e.X + e.W), float32(e.Y + cy), 1, 0.33,
-		float32(e.X + e.W - cx), float32(e.Y + e.H - cy), 0.67, 0.67,
-		float32(e.X + e.W), float32(e.Y + cy), 1, 0.33,
-		float32(e.X + e.W), float32(e.Y + e.H - cy), 1, 0.67,
-		//bottom left
-		float32(e.X), float32(e.Y + e.H - cy), 0, 0.67,
-		float32(e.X), float32(e.Y + e.H), 0, 1,
-		float32(e.X + cx), float32(e.Y + e.H - cy), 0.33, 0.67,
-		float32(e.X), float32(e.Y + e.H), 0, 1,
-		float32(e.X + cx), float32(e.Y + e.H - cy), 0.33, 0.67,
-		float32(e.X + cx), float32(e.Y + e.H), 0.33, 1,
-		//bottom middle
-		float32(e.X + cx), float32(e.Y + e.H - cy), 0.33, 0.67,
-		float32(e.X + e.W - cx), float32(e.Y + e.H - cy), 0.67, 0.67,
-		float32(e.X + cx), float32(e.Y + e.H), 0.33, 1,
-		float32(e.X + cx), float32(e.Y + e.H), 0.33, 1,
-		float32(e.X + e.W - cx), float32(e.Y + e.H - cy), 0.67, 0.67,
-		float32(e.X + e.W - cx), float32(e.Y + e.H), 0.67, 1,
-		//bottom left
-		float32(e.X + e.W - cx), float32(e.Y + e.H - cy), 0.67, 0.67,
-		float32(e.X + e.W), float32(e.Y + e.H - cy), 1, 0.67,
-		float32(e.X + e.W - cx), float32(e.Y + e.H), 0.67, 1,
-		float32(e.X + e.W - cx), float32(e.Y + e.H), 0.67, 1,
-		float32(e.X + e.W), float32(e.Y + e.H - cy), 1, 0.67,
-		float32(e.X + e.W), float32(e.Y + e.H), 1, 1,
-	}
-	fillVBO(e.pointsVBO, points)
-	if e.mouseover {
-		gl.Uniform4f(e.colorlocation, 0.9, 0.9, 0.9, 1.0)
-	} else {
-		gl.Uniform4f(e.colorlocation, 1.0, 1.0, 1.0, 1.0)
-	}
-	gl.Uniform1i(e.textureUniform, e.textureUnit)
-	gl.BindVertexArray(e.drawableVAO)
-	gl.DrawArrays(gl.TRIANGLES, 0, 6*9)
 }
 func (e *Entry) isInside(x, y float64) bool {
 	return x >= e.X && x <= e.X+e.W && y >= e.Y && y <= e.Y+e.H
@@ -166,9 +172,10 @@ func (e *Entry) isInside(x, y float64) bool {
 //command is the command you want it to run when you press enter put nil for none
 //
 //and it return a entry object
-func NewEntry(screen *Screen, text string, x, y, w, h, border float64, command func()) *Entry {
+func NewEntry(screen *Screen, text string, x, y, w, h, border float64, command func(), keyholder bool) *Entry {
 	e := Entry{}
 	e.Text = text
+	e.KeyHolder = keyholder
 	e.X = x
 	e.Y = y
 	e.W = w
