@@ -113,6 +113,8 @@ func uniformLocation(program uint32, name string) int32 {
 	free()
 	return uniform
 }
+
+// InitGlfw initializes the GLFW window
 func InitGlfw(windowsizex, windowsizey int, windowname string) *glfw.Window {
 	if err := glfw.Init(); err != nil {
 		panic(err)
@@ -131,6 +133,7 @@ func InitGlfw(windowsizex, windowsizey int, windowname string) *glfw.Window {
 	return window
 }
 
+// InitOpenGL initializes the OpenGL context
 func InitOpenGL() {
 	if err := gl.Init(); err != nil {
 		panic(err)
@@ -148,10 +151,10 @@ func InitOpenGL() {
 	gl.Enable(gl.BLEND)
 	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 }
+
 func max(num1, num2 int) int {
 	if num1 > num2 {
 		return num1
-	} else {
-		return num2
 	}
+	return num2
 }

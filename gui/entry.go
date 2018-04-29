@@ -60,10 +60,12 @@ void main(void) {
 }
 `
 
+// Remove removes the entry from the screen.
 func (e *Entry) Remove() {
 	e.Screen.entrys[len(e.Screen.entrys)-1], e.Screen.entrys[e.index] = e.Screen.entrys[e.index], e.Screen.entrys[len(e.Screen.entrys)-1]
 	e.Screen.entrys = e.Screen.entrys[:len(e.Screen.entrys)-1]
 }
+
 func (e *Entry) textSize(screen *Screen) (size float64) {
 	wi, ht := FramebufferSize(screen.Window)
 	y := e.H / 2
@@ -71,6 +73,7 @@ func (e *Entry) textSize(screen *Screen) (size float64) {
 	size = math.Min(x, y)
 	return
 }
+
 func (e *Entry) draw(screen *Screen) {
 	if !e.Hide {
 		gl.UseProgram(e.program)
@@ -161,21 +164,21 @@ func (e *Entry) isInside(x, y float64) bool {
 
 }
 
-//New Entry Makes a Entry on the Screen.
+// NewEntry Makes a Entry on the Screen.
 //
-//Screen is the screen struct you will put it on.
+// Screen is the screen struct you will put it on.
 //
-//Text is the text that will go in it (if you want starting text).
+// Text is the text that will go in it (if you want starting text).
 //
-//x, y, width (w), height (h), border, these should be self explanatory.
+// x, y, width (w), height (h), border, these should be self explanatory.
 //
-//command is the command you want it to run when you press enter put nil for none
+// command is the command you want it to run when you press enter put nil for none
 //
-//and it return a entry object
-func NewEntry(screen *Screen, text string, x, y, w, h, border float64, command func(), keyholder bool) *Entry {
+// and it return a entry object
+func NewEntry(screen *Screen, text string, x, y, w, h, border float64, command func()) *Entry {
 	e := Entry{}
 	e.Text = text
-	e.KeyHolder = keyholder
+	e.KeyHolder = false
 	e.X = x
 	e.Y = y
 	e.W = w
@@ -228,4 +231,23 @@ func NewEntry(screen *Screen, text string, x, y, w, h, border float64, command f
 	e.index = len(screen.entrys) - 1
 	screen.entrys = append(screen.entrys, &e)
 	return &e
+}
+
+// NewKeyEntry Makes a Entry on the Screen which holds a single glfw.Key value.
+//
+// Screen is the screen struct you will put it on.
+//
+// key is the key that will go in it.
+//
+// x, y, width (w), height (h), border, these should be self explanatory.
+//
+// command is the command you want it to run when you press enter put nil for none
+//
+// and it return a entry object
+func NewKeyEntry(screen *Screen, key glfw.Key, x, y, w, h, border float64, command func()) *Entry {
+	e := NewEntry(screen, "", x, y, w, h, border, command)
+	e.KeyHolder = true
+	e.Key = key
+	e.Text = KeyName(key)
+	return e
 }

@@ -65,6 +65,7 @@ type charInfo struct {
 	x, y, width, height, originX, originY, advance int
 }
 
+// FramebufferSize returns the GLFW window's framebuffer size
 func FramebufferSize(w *glfw.Window) (fbw, fbh int) {
 	fbw, fbh = w.GetFramebufferSize()
 	return

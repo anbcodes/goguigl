@@ -10,6 +10,7 @@ import (
 	"github.com/go-gl/gl/v4.1-core/gl"
 )
 
+// Button is a GUI button with a callback
 type Button struct {
 	Text           string
 	X, Y, W, H, C  float64
@@ -142,14 +143,18 @@ func (b *Button) draw(screen *Screen) {
 		gl.DrawArrays(gl.TRIANGLES, 0, 6*9)
 	}
 }
+
+// Remove removes the button from the screen
 func (b *Button) Remove() {
 	b.Screen.buttons[len(b.Screen.buttons)-1], b.Screen.buttons[b.index] = b.Screen.buttons[b.index], b.Screen.buttons[len(b.Screen.buttons)-1]
 	b.Screen.buttons = b.Screen.buttons[:len(b.Screen.buttons)-1]
 }
+
 func (b *Button) isInside(x, y float64) bool {
 	return x >= b.X && x <= b.X+b.W && y >= b.Y && y <= b.Y+b.H
-
 }
+
+// NewButton creates a new button
 func NewButton(screen *Screen, text string, x, y, w, h, border float64, command func()) *Button {
 	b := Button{}
 	b.Text = text

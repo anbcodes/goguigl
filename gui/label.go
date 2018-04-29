@@ -1,5 +1,6 @@
 package gui
 
+// Label displays text at a specified location on the screen
 type Label struct {
 	Text   string
 	X      float64
@@ -10,10 +11,13 @@ type Label struct {
 	Hide   bool
 }
 
+// Remove removes the label from the screen
 func (l *Label) Remove() {
 	l.Screen.labels[len(l.Screen.labels)-1], l.Screen.labels[l.index] = l.Screen.labels[l.index], l.Screen.labels[len(l.Screen.labels)-1]
 	l.Screen.labels = l.Screen.labels[:len(l.Screen.labels)-1]
 }
+
+// NewLabel creates a new label
 func NewLabel(screen *Screen, text string, x, y, size float64) *Label {
 	l := Label{}
 	l.Text = text
