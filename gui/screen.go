@@ -174,6 +174,9 @@ func (screen *Screen) KeyCallBack() func(w *glfw.Window, key glfw.Key, scancode 
 				e.Key = key
 				e.Text = keyName
 				e.Focus = false
+				if e.Command != nil {
+					e.Command()
+				}
 			} else {
 				switch {
 				case key == glfw.KeyBackspace:
